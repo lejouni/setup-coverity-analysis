@@ -22,6 +22,11 @@ inputs:
     description: With this you can space separated list of folders which you are not needed from Coverity Analysis and that way safe some space. (by default are removed architecture-analysis sdk dynamic-analysis forcheck doc)
     required: false
     default: architecture-analysis sdk dynamic-analysis forcheck doc
+  cov_configures:
+    description: With this you can configure Coverity Analysis. (by default cov-configure --java && cov-configure --javascript && cov-configure --python && cov-configure --kotlin && cov-configure --gcc --xml-option=prepend_arg:--ppp_translator --xml-option=prepend_arg:"replace/#\s*error \"Do not include _sd-common.h directly; it is a private header.\"/" && cov-configure --template --compiler c++ --comptype gcc && cov-configure --template --compiler cc --comptype gcc)
+    required: false
+    default: cov-configure --java && cov-configure --javascript && cov-configure --python && cov-configure --kotlin && cov-configure --gcc --xml-option=prepend_arg:--ppp_translator --xml-option=prepend_arg:"replace/#\s*error \"Do not include _sd-common.h directly; it is a private header.\"/" && cov-configure --template --compiler c++ --comptype gcc && cov-configure --template --compiler cc --comptype gcc
+
 runs:
   using: composite
   steps:
@@ -44,5 +49,8 @@ runs:
       shell: bash
     # Third step is to run Coverity configures.
     - run: |
-        cov-configure --java && cov-configure --javascript && cov-configure --python && cov-configure --kotlin && cov-configure --gcc --xml-option=prepend_arg:--ppp_translator --xml-option=prepend_arg:"replace/#\s*error \"Do not include _sd-common.h directly; it is a private header.\"/" && cov-configure --template --compiler c++ --comptype gcc && cov-configure --template --compiler cc --comptype gcc
+        if [ ! -z ${{inputs.cov_configures}} ]
+        then
+          ${{inputs.cov_configures}}
+        fi
       shell: bash
