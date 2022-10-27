@@ -48,9 +48,7 @@ runs:
     - run: echo "${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin" >> $GITHUB_PATH
       shell: bash
     # Third step is to run Coverity configures.
-    - run: |
-        if [ ! -z ${{inputs.cov_configures}} ]
-        then
-          ${{inputs.cov_configures}}
-        fi
+    - name:
+      if: ${{inputs.cov_configures != ''}}
+      run: ${{inputs.cov_configures}}
       shell: bash
