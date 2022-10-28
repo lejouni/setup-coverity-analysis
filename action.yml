@@ -54,16 +54,16 @@ runs:
     # Second step is to add coverity bin -folder into runners PATH
     - run: echo "${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin" >> $GITHUB_PATH
       shell: bash
-    # Third step is to set project and stream name as environmental params and replace special characters /%&- and space to _
+    # Third step is to set project and stream name as environmental params and replace special characters /%& and space to _
     # Project name can be found like ${{env.project}} and stream like ${{env.stream}}
     - name: Set Project and Stream names into env
       if: ${{inputs.project != '' && inputs.stream != ''}}
       run: |
         origin_name=${{inputs.project}}
-        project_name=${origin_name//[\/ %&-]/_}
+        project_name=${origin_name//[\/ %&]/_}
         echo "project=$project_name" >> $GITHUB_ENV
         origin_stream_name=${{inputs.stream}}
-        stream_name=${origin_stream_name//[\/ %&-]/_}
+        stream_name=${origin_stream_name//[\/ %&]/_}
         echo "stream=$stream_name" >> $GITHUB_ENV
       shell: bash
     # Fourth step is to run Coverity configures.
