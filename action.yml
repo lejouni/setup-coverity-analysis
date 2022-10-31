@@ -74,14 +74,12 @@ runs:
       with:
         path: ${{inputs.cov_install_folder}}
         key: cache-coverity-tools-${{ steps.get-date.outputs.date }} #Cache is for 1 day
-      shell: bash
     - if: ${{inputs.cache == 'idir' || inputs.cache == 'all'}}
       id: cache-coverity-idir
       uses: actions/cache@v3
       with:
         path: ${{inputs.cov_intermediate_dir}}
         key: cache-coverity-idir-${{env.project}}-${{env.stream}}-${{ steps.get-date.outputs.date }} #Cache is for 1 day
-      shell: bash
     # First step is to download the Coverity Analysis tar -file and extract it and remove not needed folders to minimize the needed space.
     - if: steps.cache-coverity-tools.outputs.cache-hit != 'true'
       run: |
