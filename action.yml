@@ -41,12 +41,37 @@ inputs:
     description: With this you can configure Coverity Analysis. (by default cov-configure --java && cov-configure --javascript && cov-configure --python && cov-configure --kotlin && cov-configure --gcc --xml-option=prepend_arg:--ppp_translator --xml-option=prepend_arg:"replace/#\s*error \"Do not include _sd-common.h directly; it is a private header.\"/" && cov-configure --template --compiler c++ --comptype gcc && cov-configure --template --compiler cc --comptype gcc)
     required: false
     default: cov-configure --java && cov-configure --javascript && cov-configure --python && cov-configure --kotlin && cov-configure --gcc --xml-option=prepend_arg:--ppp_translator --xml-option=prepend_arg:"replace/#\s*error \"Do not include _sd-common.h directly; it is a private header.\"/" && cov-configure --template --compiler c++ --comptype gcc && cov-configure --template --compiler cc --comptype gcc
-
+  cov_intermediate_dir:
+    description: Intermediate directory
+    required: false
+    default: ${{github.workspace}}/idir
+  cache: 
+    description: Coverity tools and Intermediate directory can be cached. Options coverity, idir and all. Coverity will only cache Coverity tools, idir will cache only intermediate dir and all will cache both.
+    required: false
+    
 runs:
   using: composite
   steps:
+    - if: ${{inputs.cache == 'coverity' || inputs.cache == 'idir' || inputs.cache == 'all'}}
+      id: get-date
+      run: |
+        echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
+      shell: bash
+    - if: ${{inputs.cache == 'coverity' || inputs.cache == 'all'}}
+      id: cache-coverity-tools
+      uses: actions/cache@v3
+      with:
+        path: ${{inputs.cov_install_folder}}
+        key: cache-coverity-tools-${{ steps.get-date.outputs.date }} #Cache is for 1 day
+    - if: ${{inputs.cache == 'idir' || inputs.cache == 'all'}}
+      id: cache-coverity-idir
+      uses: actions/cache@v3
+      with:
+        path: ${{inputs.cov_install_folder}}
+        key: cache-coverity-tools-${{ steps.get-date.outputs.date }} #Cache is for 1 day
     # First step is to download the Coverity Analysis tar -file and extract it and remove not needed folders to minimize the needed space.
-    - run: |
+    - if: steps.cache-coverity-tools.outputs.cache-hit != 'true'
+      run: |
         : #Get Coverity Analysis tools from Coverity server and extract them and remove tools which are not needed
         mkdir -p ${{inputs.cov_install_folder}}
         curl -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}.tar.gz ${{inputs.cov_url}}/downloads/${{inputs.cov_version}}.tar.gz
