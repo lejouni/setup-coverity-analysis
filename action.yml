@@ -48,10 +48,21 @@ inputs:
   cache: 
     description: Coverity tools and Intermediate directory can be cached. Options coverity, idir and all. Coverity will only cache Coverity tools, idir will cache only intermediate dir and all will cache both.
     required: false
-    
+
 runs:
   using: composite
   steps:
+    # First step is to set project and stream name as environmental params and replace special characters /%& and space to _
+    # Project name can be found like ${{env.project}} and stream like ${{env.stream}}
+    - name: Set Project and Stream names into env
+      run: |
+        origin_name=${{inputs.project}}
+        project_name=${origin_name//[\/ %&]/_}
+        echo "project=$project_name" >> $GITHUB_ENV
+        origin_stream_name=${{inputs.stream}}
+        stream_name=${origin_stream_name//[\/ %&]/_}
+        echo "stream=$stream_name" >> $GITHUB_ENV
+      shell: bash
     - if: ${{inputs.cache == 'coverity' || inputs.cache == 'idir' || inputs.cache == 'all'}}
       id: get-date
       run: |
@@ -67,8 +78,8 @@ runs:
       id: cache-coverity-idir
       uses: actions/cache@v3
       with:
-        path: ${{inputs.cov_install_folder}}
-        key: cache-coverity-tools-${{ steps.get-date.outputs.date }} #Cache is for 1 day
+        path: ${{inputs.cov_intermediate_dir}}
+        key: cache-coverity-idir-${{env.project}}-${{env.stream}}-${{ steps.get-date.outputs.date }} #Cache is for 1 day
     # First step is to download the Coverity Analysis tar -file and extract it and remove not needed folders to minimize the needed space.
     - if: steps.cache-coverity-tools.outputs.cache-hit != 'true'
       run: |
@@ -87,18 +98,9 @@ runs:
     # Second step is to add coverity bin -folder into runners PATH
     - run: echo "${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin" >> $GITHUB_PATH
       shell: bash
-    # Third step is to set project and stream name as environmental params and replace special characters /%& and space to _
-    # Project name can be found like ${{env.project}} and stream like ${{env.stream}}
-    - name: Set Project and Stream names into env
-      if: ${{inputs.project != '' && inputs.stream != ''}}
+    - if: steps.cache-coverity-idir.outputs.cache-hit == 'true'
       run: |
-        origin_name=${{inputs.project}}
-        project_name=${origin_name//[\/ %&]/_}
-        echo "project=$project_name" >> $GITHUB_ENV
-        origin_stream_name=${{inputs.stream}}
-        stream_name=${origin_stream_name//[\/ %&]/_}
-        echo "stream=$stream_name" >> $GITHUB_ENV
-      shell: bash
+        cov-manage-emit --dir ${{inputs.cov_intermediate_dir}} reset-host-name
     - name: Set other env variables
       run: |
         echo "cov_url=${{inputs.cov_url}}" >> $GITHUB_ENV
