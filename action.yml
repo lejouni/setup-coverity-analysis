@@ -70,6 +70,12 @@ runs:
         stream_name=${origin_stream_name//[\/ %&]/_}
         echo "stream=$stream_name" >> $GITHUB_ENV
       shell: bash
+    # Testing is project and stream exists
+    - run: |
+        pip3 install requests
+        python3 ${{github.action_path}}/coverityProjectStreamChecker.py --coverity_url=${{inputs.cov_url}} --project_name=${{env.project}} --stream_name=${{env.stream}} --username=${{inputs.cov_username}} --password=${{inputs.cov_password}} --log_level=${{inputs.log_level}}
+      shell: bash
+
     - if: ${{inputs.cache == 'idir' || inputs.cache == 'all'}}
       id: get-date
       run: |
