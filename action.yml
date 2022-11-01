@@ -32,7 +32,8 @@ inputs:
     required: false
   cov_install_folder:
     description: To which folder the tools are extracted
-    required: true
+    required: false
+    default: /tmp/cache/coverity
   cov_remove_folders:
     description: With this you can space separated list of folders which you are not needed from Coverity Analysis and that way safe some space. (by default are removed architecture-analysis sdk dynamic-analysis forcheck doc)
     required: false
@@ -52,7 +53,7 @@ inputs:
 runs:
   using: composite
   steps:
-    # First step is to set project and stream name as environmental params and replace special characters /%& and space to _
+    # Set project and stream name as environmental params and replace special characters /%& and space to _
     # Project name can be found like ${{env.project}} and stream like ${{env.stream}}
     - name: Set Project and Stream names into env
       run: |
@@ -80,7 +81,7 @@ runs:
       with:
         path: ${{inputs.cov_intermediate_dir}}
         key: cache-coverity-idir-${{env.project}}-${{env.stream}}-${{ steps.get-date.outputs.date }} #Cache is for 1 day
-    # First step is to download the Coverity Analysis tar -file and extract it and remove not needed folders to minimize the needed space.
+    # Download the Coverity Analysis tar -file and extract it and remove not needed folders to minimize the needed space.
     - if: steps.cache-coverity-tools.outputs.cache-hit != 'true'
       run: |
         : #Get Coverity Analysis tools from Coverity server and extract them and remove tools which are not needed
@@ -95,7 +96,7 @@ runs:
           cp ${{inputs.cov_license}} ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin
         fi
       shell: bash
-    # Second step is to add coverity bin -folder into runners PATH
+    # Add coverity bin -folder into runners PATH
     - run: echo "${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin" >> $GITHUB_PATH
       shell: bash
     - if: steps.cache-coverity-idir.outputs.cache-hit == 'true'
@@ -109,7 +110,7 @@ runs:
         echo "cov_password=${{inputs.cov_password}}" >> $GITHUB_ENV
         echo "cov_install_folder=${{inputs.cov_install_folder}}" >> $GITHUB_ENV
       shell: bash
-    # Fourth step is to run Coverity configures.
+    # Run Coverity configures.
     - name:
       if: ${{inputs.cov_configures != ''}}
       run: ${{inputs.cov_configures}}
