@@ -85,6 +85,7 @@ runs:
       run: |
         : #Get Coverity Analysis tools from Coverity server and extract them and remove tools which are not needed
         mkdir -p /tmp/coverity/${{inputs.cov_version}}
+        mkdir -p ${{inputs.cov_install_folder}}
         curl -f -o /tmp/coverity/${{inputs.cov_version}}/${{inputs.cov_version}}.tar.gz ${{inputs.cov_url}}/downloads/${{inputs.cov_version}}.tar.gz
         tar -xf /tmp/coverity/${{inputs.cov_version}}/${{inputs.cov_version}}.tar.gz -C ${{inputs.cov_install_folder}}
         cd ${{inputs.cov_install_folder}}/${{inputs.cov_version}} && rm -rf ${{inputs.cov_remove_folders}}
