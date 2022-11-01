@@ -55,6 +55,10 @@ inputs:
   cache: 
     description: Coverity tools and Intermediate directory can be cached. Options coverity, idir and all. Coverity will only cache Coverity tools, idir will cache only intermediate dir and all will cache both.
     required: false
+  create_if_not_exists:
+    description: Create project and stream if they do not exists
+    required: false
+    default: false
 
 runs:
   using: composite
@@ -71,11 +75,11 @@ runs:
         echo "stream=$stream_name" >> $GITHUB_ENV
       shell: bash
     # Testing is project and stream exists
-    - run: |
+    - if: ${{inputs.create_if_not_exists}}
+      run: |
         pip3 install requests
         python3 ${{github.action_path}}/coverityProjectStreamChecker.py --coverity_url=${{inputs.cov_url}} --project_name=${{env.project}} --stream_name=${{env.stream}} --username=${{inputs.cov_username}} --password=${{inputs.cov_password}} --log_level=${{inputs.log_level}}
       shell: bash
-
     - if: ${{inputs.cache == 'idir' || inputs.cache == 'all'}}
       id: get-date
       run: |
