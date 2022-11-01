@@ -87,7 +87,7 @@ runs:
         mkdir -p ${{inputs.cov_install_folder}}
         curl -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}.tar.gz ${{inputs.cov_url}}/downloads/${{inputs.cov_version}}.tar.gz
         tar -xf ${{inputs.cov_install_folder}}/${{inputs.cov_version}}.tar.gz
-        cd ${{inputs.cov_install_folder}}/${{inputs.cov_version}} && rm -rf ${{inputs.cov_remove_folders}} && rm -rf ${{inputs.cov_version}}.tar.gz
+        cd ${{inputs.cov_install_folder}} && rm -rf ${{inputs.cov_remove_folders}} && rm -rf ${{inputs.cov_version}}.tar.gz
         if [ -z ${{inputs.cov_license}} ]
         then 
           curl -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat ${{inputs.cov_url}}/downloads/license.dat
