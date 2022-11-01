@@ -6,6 +6,10 @@ branding:
   icon: shield
   color: blue
 inputs:
+  log_level:
+    description: Logging level
+    default: DEBUG
+    required: false
   project:
     description: Project name in Coverity Connect, if not given then default=github.repository
     required: false
