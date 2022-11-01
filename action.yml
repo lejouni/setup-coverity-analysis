@@ -63,7 +63,7 @@ runs:
         stream_name=${origin_stream_name//[\/ %&]/_}
         echo "stream=$stream_name" >> $GITHUB_ENV
       shell: bash
-    - if: ${{inputs.cache == 'coverity' || inputs.cache == 'idir' || inputs.cache == 'all'}}
+    - if: ${{inputs.cache == 'idir' || inputs.cache == 'all'}}
       id: get-date
       run: |
         echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
@@ -72,7 +72,7 @@ runs:
       id: cache-coverity-tools
       uses: actions/cache@v3
       with:
-        path: /tmp/coverity/${{inputs.cov_version}}
+        path: ${{inputs.cov_install_folder}}
         key: cache-coverity-tools-${{ inputs.cov_version }} #Cache is for cov_version
     - if: ${{inputs.cache == 'idir' || inputs.cache == 'all'}}
       id: cache-coverity-idir
@@ -84,11 +84,10 @@ runs:
     - if: steps.cache-coverity-tools.outputs.cache-hit != 'true'
       run: |
         : #Get Coverity Analysis tools from Coverity server and extract them and remove tools which are not needed
-        mkdir -p /tmp/coverity/${{inputs.cov_version}}
         mkdir -p ${{inputs.cov_install_folder}}
-        curl -f -o /tmp/coverity/${{inputs.cov_version}}/${{inputs.cov_version}}.tar.gz ${{inputs.cov_url}}/downloads/${{inputs.cov_version}}.tar.gz
-        tar -xf /tmp/coverity/${{inputs.cov_version}}/${{inputs.cov_version}}.tar.gz -C ${{inputs.cov_install_folder}}
-        cd ${{inputs.cov_install_folder}}/${{inputs.cov_version}} && rm -rf ${{inputs.cov_remove_folders}}
+        curl -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}.tar.gz ${{inputs.cov_url}}/downloads/${{inputs.cov_version}}.tar.gz
+        tar -xf ${{inputs.cov_install_folder}}/${{inputs.cov_version}}.tar.gz
+        cd ${{inputs.cov_install_folder}}/${{inputs.cov_version}} && rm -rf ${{inputs.cov_remove_folders}} && rm -rf ${{inputs.cov_version}}.tar.gz
         if [ -z ${{inputs.cov_license}} ]
         then 
           curl -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat ${{inputs.cov_url}}/downloads/license.dat
