@@ -1,4 +1,4 @@
-#TODO:  - Add cache usage at request
+#TODO:  - Add support for project and stream creation if not exists (separate action?)
 name: "Coverity tools for local analysis"
 description: "Will download the given version of Coverity Analysis tools from given Coverity Connect and extract them into given folder. Will also add Coverity analysis tools into current runner PATH"
 author: Jouni Lehto
@@ -109,6 +109,7 @@ runs:
         echo "cov_username=${{inputs.cov_username}}" >> $GITHUB_ENV
         echo "cov_password=${{inputs.cov_password}}" >> $GITHUB_ENV
         echo "cov_install_folder=${{inputs.cov_install_folder}}" >> $GITHUB_ENV
+        echo "cov_intermediate_dir=${{inputs.cov_intermediate_dir}}" >> $GITHUB_ENV
       shell: bash
     # Run Coverity configures.
     - name:
