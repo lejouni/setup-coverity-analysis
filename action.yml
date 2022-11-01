@@ -46,6 +46,12 @@ inputs:
     description: Intermediate directory
     required: false
     default: ${{github.workspace}}/idir
+  cov_output_format:
+    description: With this you can specify that do you want to have output as a json or html format. If not given, then no output file created. Options are json or html.
+    required: false
+  cov_output:
+    description: What is wanted as an output. Html case, output must be folder with fullpath where you want to html report to be created, json case outoput must be json file with full path and sarif case it must be sarif file with full path.
+    required: false
   cache: 
     description: Coverity tools and Intermediate directory can be cached. Options coverity, idir and all. Coverity will only cache Coverity tools, idir will cache only intermediate dir and all will cache both.
     required: false
@@ -110,6 +116,8 @@ runs:
         echo "cov_password=${{inputs.cov_password}}" >> $GITHUB_ENV
         echo "cov_install_folder=${{inputs.cov_install_folder}}" >> $GITHUB_ENV
         echo "cov_intermediate_dir=${{inputs.cov_intermediate_dir}}" >> $GITHUB_ENV
+        echo "cov_output_format=${{inputs.cov_output_format}}" >> $GITHUB_ENV
+        echo "cov_output=${{inputs.cov_output}}" >> $GITHUB_ENV
       shell: bash
     # Run Coverity configures.
     - name:
