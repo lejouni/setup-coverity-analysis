@@ -6,47 +6,41 @@ from timeit import default_timer as timer
 
 
 __author__ = "Jouni Lehto"
-__versionro__="0.1.0"
+__versionro__="0.1.1"
 
 def createStream(streamName, projectName):
-    if not isStream(streamName):
-        logging.debug(f'Stream with name: {streamName} did not exists -> creating it' )
-        params={
-            "description": "Stream created via API",
-            "name": streamName,
-            "primaryProjectName": projectName,
-            "triageStoreName": "Default Triage Store",
-            "versionMismatchMessage": "null"
-        }
-        headers = {'Accept': 'application/json'}
-        endpoint = f'/api/v2/streams?locale=en_us'
-        r = requests.post(args.coverity_url + endpoint, headers=headers, auth=(args.username, args.password), json=params)
-        if( r.status_code == 201 ):
-            logging.debug(f'Stream with name {streamName} is created.')
-        else:
-            raise SystemExit(f'Stream creation with name {streamName} failed!, error: {r.content}')
+    logging.debug(f'Stream with name: {streamName} did not exists -> creating it' )
+    params={
+        "description": "Stream created via API",
+        "name": streamName,
+        "primaryProjectName": projectName,
+        "triageStoreName": "Default Triage Store",
+        "versionMismatchMessage": "null"
+    }
+    headers = {'Accept': 'application/json'}
+    endpoint = f'/api/v2/streams?locale=en_us'
+    r = requests.post(args.coverity_url + endpoint, headers=headers, auth=(args.username, args.password), json=params)
+    if( r.status_code == 201 ):
+        logging.debug(f'Stream with name {streamName} is created.')
     else:
-        logging.debug(f'Stream with name {streamName} exists -> no need to create!')
+        raise SystemExit(f'Stream creation with name {streamName} failed!, error: {r.content}')
 
 def createProject(projectName):
-    if not isProject(projectName):
-        logging.debug(f'Project with name {projectName} did not exists -> creating it')
-        params={
-            "description": "Project created via API",
-            "name": projectName,
-            "roleAssignments": [],
-            "streamLinks": [],
-            "streams": []
-        }
-        headers = {'Accept': 'application/json'}
-        endpoint = f'/api/v2/projects?locale=en_us'
-        r = requests.post(args.coverity_url + endpoint, headers=headers, auth=(args.username, args.password), json=params)
-        if( r.status_code == 201 ):
-            logging.debug(f'Project with name {projectName} is created.')
-        else:
-            raise SystemExit(f'Project creation with name {projectName} failed!, error: {r.content}')
+    logging.debug(f'Project with name {projectName} did not exists -> creating it')
+    params={
+        "description": "Project created via API",
+        "name": projectName,
+        "roleAssignments": [],
+        "streamLinks": [],
+        "streams": []
+    }
+    headers = {'Accept': 'application/json'}
+    endpoint = f'/api/v2/projects?locale=en_us'
+    r = requests.post(args.coverity_url + endpoint, headers=headers, auth=(args.username, args.password), json=params)
+    if( r.status_code == 201 ):
+        logging.debug(f'Project with name {projectName} is created.')
     else:
-        logging.debug(f'Project with name {projectName} exists -> no need to create!')
+        raise SystemExit(f'Project creation with name {projectName} failed!, error: {r.content}')
 
 
 #
@@ -101,8 +95,14 @@ if __name__ == '__main__':
     #Printing out the version number
     logging.info("Coverity Project and Stream Checker version: " + __versionro__)
     #Creating project if it is not existing yet
-    createProject(args.project_name)
-    createStream(args.stream_name, args.project_name)
+    if not isStream(args.stream_name):
+        if not isProject(args.project_name):
+            createProject(args.project_name)
+        else:
+            logging.debug(f'Project with name {args.project_name} exists -> no need to create!')
+        createStream(args.stream_name, args.project_name)
+    else:
+        logging.debug(f'Stream with name {args.stream_name} exists -> no need to create!')
     if(logging.getLogger().isEnabledFor(logging.INFO)):
         end = timer()
         logging.info(f"Checking took: {end - start} seconds.")
