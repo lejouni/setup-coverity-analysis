@@ -76,7 +76,7 @@ runs:
         echo "project=$project_name" >> $GITHUB_ENV
         origin_stream_name=${{inputs.stream}}
         stream_name=${origin_stream_name//[\/ %&]/_}
-        echo "stream=$stream_name" >> $GITHUB_ENV
+        echo "stream=$project_name-$stream_name" >> $GITHUB_ENV
       shell: bash
     # Testing is project and stream exists
     - if: ${{inputs.create_if_not_exists}}
