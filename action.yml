@@ -1,4 +1,3 @@
-#TODO:  - Add support for project and stream creation if not exists (separate action?)
 name: "Coverity tools for local analysis"
 description: "Will download the given version of Coverity Analysis tools from given Coverity Connect and extract them into given folder. Will also add Coverity analysis tools into current runner PATH"
 author: Jouni Lehto
