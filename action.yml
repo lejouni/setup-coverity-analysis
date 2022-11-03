@@ -71,10 +71,10 @@ runs:
     - name: Set Project and Stream names into env
       run: |
         origin_name=${{inputs.project}}
-        project_name=${origin_name//[\/ %&]/_}
+        project_name=${origin_name//[\/ %&]/-}
         echo "project=$project_name" >> $GITHUB_ENV
         origin_stream_name=${{inputs.stream}}
-        stream_name=${origin_stream_name//[\/ %&]/_}
+        stream_name=${origin_stream_name//[\/ %&]/-}
         echo "stream=$project_name-$stream_name" >> $GITHUB_ENV
       shell: bash
     # Testing is project and stream exists
