@@ -3,7 +3,7 @@ This will setup the Coverity Analysis tools into PATH. It will download the give
 
 ## Available Options
 | Option name | Description | Default value | Required |
-|----------|----------|---------|-----|
+|----------|----------|---------|----------|
 | log_level | Logging level | DEBUG | false |
 | project | Project name in Coverity Connect, if not given then default=github.repository | ${{github.repository}} | false |
 | stream | Project stream name in Coverity Connect, if not given then default=github.ref_name | ${{github.ref_name}} | false |
