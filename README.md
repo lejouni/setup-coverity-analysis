@@ -1,5 +1,5 @@
 # setup-coverity-analysis
-This will setup the Coverity Analysis tools into PATH. It will download the given version from given Coverity Connect instance. Will extract the coverity tar -file into given location. This location can be added to cache for example.
+This github action will download the Coverity Analysis tools from given Coverity Connect and extract them into given location. If cache is used, then tools are not installed again, only once per given Coverity Analsysi tool version. Coverity Analaysis tools bin folder is set to runner PATH, so all the Coverity tools are available. Will also add some key-value pairs to environmen variables and after setup they are available for next steps in the pipeline.
 
 ## Available Options
 | Option name | Description | Default value | Required |
