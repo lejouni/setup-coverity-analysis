@@ -18,8 +18,23 @@ This will setup the Coverity Analysis tools into PATH. It will download the give
 | cov_intermediate_dir | Intermediate directory | ${{github.workspace}}/idir | false |
 | cov_output_format | With this you can specify that do you want to have output as a json, sarif or html format. If not given, then no output file created. Options are json, sarif or html. | - | false |
 | cov_output | What is wanted as an output. Html case, output must be folder with fullpath where you want to html report to be created, json case outoput must be json file with full path and sarif case it must be sarif file with full path. | - | false |
-| cache | Coverity tools and Intermediate directory can be cached. Options coverity, idir and all. Coverity will only cache Coverity tools, idir will cache only intermediate dir and all will cache both. | - | false |
+| cache | Coverity tools and Intermediate directory can be cached. Options are coverity, idir and all. Coverity will only cache Coverity tools, idir will cache only intermediate dir and all will cache both. The cache for intermediate directory is set only for current day. The cache for Coverity tools are set for the Coverity version. The coverity cache will stay active if it is used within a week, otherwise it will be deleted automatically. | - | false |
 | create_if_not_exists | Create project and stream if they do not exists | false | false |
+
+## Values which will be set into environment variables
+
+These key-value pairs are set into environment values and are accessed with **${{env.key}}**
+| Key | Value |
+|----------|--------|
+| project | Given project name or ${{github.repository}}. Will replace special characters "\/ %&" with "-". Example: Organiztion/projectName -> Organization-projectName.|
+| stream | project-given stream name or ${{github.ref_name}}. Will replace special characters "\/ %&" with "-". Example: Organization-projectName-main |
+| cov_url | ${{inputs.cov_url}} |
+| cov_username | ${{inputs.cov_username}} |
+| cov_password | ${{inputs.cov_password}} |
+| cov_install_folder | ${{inputs.cov_install_folder}} |
+| cov_intermediate_dir | ${{inputs.cov_intermediate_dir}} |
+| cov_output_format | ${{inputs.cov_output_format}} |
+| cov_output | ${{inputs.cov_output}} |
 
 ## Usage
 
@@ -38,7 +53,12 @@ This will setup the Coverity Analysis tools into PATH. It will download the give
         create_if_not_exists: true # will create project and stream if they don't exists yet
         cache: coverity # Optional, but if given the options are coverity, idir and all
 ```
+
 **Example to run buildless analysis with [lejouni/coverity-buildless-analysis](https://github.com/lejouni/coverity-buildless-analysis)**
+
+Prerequisite is that lejouni/setup-coverity-analysis -action is executed first or Coverity tools are installed into the runner PATH in some other way.
+
+Lejouni/coverity-buildless-analysis -action is utilizing those environment variables set by this setup -action.
 ```yaml
     - if: ${{github.event_name == 'pull_request'}}
       name: Build with Maven and Full Analyze with Coverity # This will run the full Coverity Analsysis
@@ -54,7 +74,12 @@ This will setup the Coverity Analysis tools into PATH. It will download the give
         cov_analysis_mode: incremental # Optional, but options are full (default) or incremental
         github_access_token: ${{secrets.ACCESS_TOKEN_GITHUB}} # this is required in incremental mode, used to get changed files via Github API
 ```
+
 **Example to run build analysis with [lejouni/coverity-build-analysis](https://github.com/lejouni/coverity-build-analysis)**
+
+Prerequisite is that lejouni/setup-coverity-analysis -action is executed first or Coverity tools are installed into the runner PATH in some other way.
+
+Lejouni/coverity-build-analysis -action is utilizing those environment variables set by this setup -action.
 ```yaml
     - if: ${{github.event_name == 'pull_request'}}
       name: Build with Maven and Full Analyze with Coverity # This will run the full Coverity Analsysis
