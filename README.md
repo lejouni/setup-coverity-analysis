@@ -38,7 +38,73 @@ These key-value pairs are set into environment values and are accessed with **${
 
 ## Usage
 
-**Example to run setup:**
+**Example full pipeline:**
+```yaml
+name: Java CI with Maven and Coverity
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3 # This will checkout the source codes from repository
+
+    - name: Set up JDK 1.11 # This will add Java into the runners PATH
+      uses: actions/setup-java@v3.6.0
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: 'maven' # Cache maven modules
+
+    - name: Set up Coverity # This will add Coverity Analysis tools into runner PATH
+      uses: lejouni/setup-coverity-analysis@v2.8.18
+      with:
+        cov_version: cov-analysis-linux64-2022.6.1
+        cov_url: ${{secrets.COVERITY_SERVER_URL}}
+        cov_license: ${{github.workspace}}/scripts/license.dat
+        cov_username: ${{secrets.COVERITY_USERNAME}}
+        cov_password: ${{secrets.COVERITY_ACCESS_TOKEN}}
+        cov_output_format: sarif #Optional, but if given the options are html, json and sarif
+        cov_output: ${{github.workspace}}/coverity_results.sarif.json
+        create_if_not_exists: true # will create project and stream if they don't exists yet
+        cache: coverity # Optional, but if given the options are coverity, idir and all
+
+    - if: ${{github.event_name == 'pull_request'}}
+      name: Build with Maven and Full Analyze with Coverity # This will run the full Coverity Analsysis
+      uses: lejouni/coverity-buildless-analysis@v2.8.28
+      with:
+        cov_capture_mode: project # Options are project, scm, source (default) and config
+
+    - if: ${{github.event_name == 'push'}}
+      name: Build with Maven and Incremental Analyze with Coverity # This will run the incremental Coverity Analsysis
+      uses: lejouni/coverity-buildless-analysis@v2.8.28
+      with:
+        cov_capture_mode: project # Options are project, scm, source (default) and config
+        cov_analysis_mode: incremental # Optional, but options are full (default) or incremental
+        github_access_token: ${{secrets.ACCESS_TOKEN_GITHUB}} # this is required in incremental mode, used to get changed files via Github API
+
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        # Path to SARIF file
+        sarif_file: ${{github.workspace}}/coverity_results.sarif.json
+      continue-on-error: true
+
+    - name: Archive scanning results
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverity-scan-results
+        path: ${{github.workspace}}/coverity_results.sarif.json
+      continue-on-error: true
+```
+
+**Setup part:**
 ```yaml
     - name: Set up Coverity # This will add Coverity Analysis tools into runner PATH
       uses: lejouni/setup-coverity-analysis@v2.8.18
@@ -54,7 +120,7 @@ These key-value pairs are set into environment values and are accessed with **${
         cache: coverity # Optional, but if given the options are coverity, idir and all
 ```
 
-**Example to run buildless analysis with [lejouni/coverity-buildless-analysis](https://github.com/lejouni/coverity-buildless-analysis)**
+**Buildless analysis with [lejouni/coverity-buildless-analysis](https://github.com/lejouni/coverity-buildless-analysis)**
 
 Prerequisite is that lejouni/setup-coverity-analysis -action is executed first or Coverity tools are installed into the runner PATH in some other way.
 
@@ -75,7 +141,9 @@ Lejouni/coverity-buildless-analysis -action is utilizing those environment varia
         github_access_token: ${{secrets.ACCESS_TOKEN_GITHUB}} # this is required in incremental mode, used to get changed files via Github API
 ```
 
-**Example to run build analysis with [lejouni/coverity-build-analysis](https://github.com/lejouni/coverity-build-analysis)**
+**Build analysis with [lejouni/coverity-build-analysis](https://github.com/lejouni/coverity-build-analysis)**
+
+If you need to run build command in oder to build your application like in C/C++, then you must use this action.
 
 Prerequisite is that lejouni/setup-coverity-analysis -action is executed first or Coverity tools are installed into the runner PATH in some other way.
 
@@ -85,12 +153,12 @@ Lejouni/coverity-build-analysis -action is utilizing those environment variables
       name: Build with Maven and Full Analyze with Coverity # This will run the full Coverity Analsysis
       uses: lejouni/coverity-build-analysis@v4.3.3
       with:
-        build_command: mvn -B package --file pom.xml
+        build_command: mvn -B package --file pom.xml # Used build command must be given.
     - if: ${{github.event_name == 'push'}}
       name: Build with Maven and Incremental Analyze with Coverity # This will run the incremental Coverity Analsysis
       uses: lejouni/coverity-build-analysis@v4.3.3
       with:
-        build_command: mvn -B package --file pom.xml
+        build_command: mvn -B package --file pom.xml # Used build command must be given.
         cov_analysis_mode: incremental # Optional, but options are full (default) or incremental
         github_access_token: ${{secrets.ACCESS_TOKEN_GITHUB}} # this is required in incremental mode, used to get changed files via Github API
 ```
