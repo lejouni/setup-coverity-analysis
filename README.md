@@ -1,6 +1,9 @@
 # setup-coverity-analysis
 This github action will download the Coverity Analysis tools from given Coverity Connect and extract them into given location. If cache is used, then tools are not installed again, only once per given Coverity Analsysi tool version. Coverity Analaysis tools bin folder is set to runner PATH, so all the Coverity tools are available. Will also add some key-value pairs to environmen variables and after setup they are available for next steps in the pipeline.
 
+## Prerequisities
+This action expects that given Coverity Analysis tool version is available in download -folder in given Coverity Connect URL. This action is trying to download tar file of the given Coverity Analysis version. For Example: if cov_version = cov-analysis-linux64-2022.6.1, then action will try to download tar file with name cov-analysis-linux64-2022.6.1.tar.gz. The download url will be: inputs.cov_url/downloads/inputs.cov_version.tar.gz. If you dont't give the lisence file with cov_license -parameter, then this action will try to download it from the same download folder than the Coverity Analysis tools tar -file (inputs.cov_url/downloads/license.dat).
+
 ## Available Options
 | Option name | Description | Default value | Required |
 |----------|----------|---------|----------|
