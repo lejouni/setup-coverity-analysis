@@ -46,8 +46,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches:
-      - "main"
+    branches: [ main ]
 
 jobs:
   build-and-scan:
@@ -66,10 +65,10 @@ jobs:
       uses: lejouni/setup-coverity-analysis@v2.8.18
       with:
         cov_version: cov-analysis-linux64-2022.6.1
-        cov_url: ${{secrets.COVERITY_SERVER_URL}}
+        cov_url: ${{secrets.COVERITY_SERVER_URL}} #Coverity Connect server URL
         cov_license: ${{github.workspace}}/scripts/license.dat
-        cov_username: ${{secrets.COVERITY_USERNAME}}
-        cov_password: ${{secrets.COVERITY_ACCESS_TOKEN}}
+        cov_username: ${{secrets.COVERITY_USERNAME}} #Coverity Connect username
+        cov_password: ${{secrets.COVERITY_ACCESS_TOKEN}} #Coverity Connect password
         cov_output_format: sarif #Optional, but if given the options are html, json and sarif
         cov_output: ${{github.workspace}}/coverity_results.sarif.json
         create_if_not_exists: true # will create project and stream if they don't exists yet
