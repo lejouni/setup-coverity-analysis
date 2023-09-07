@@ -105,12 +105,12 @@ runs:
       run: |
         : #Get Coverity Analysis tools from Coverity server and extract them and remove tools which are not needed
         mkdir -p ${{inputs.cov_install_folder}}
-        curl -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}.tar.gz ${{inputs.cov_url}}/downloads/${{inputs.cov_version}}.tar.gz
+        curl --user ${{inputs.cov_username}}:"${{inputs.cov_password}}" -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}.tar.gz ${{inputs.cov_url}}/downloadFile.htm?fn=${{inputs.cov_version}}.tar.gz
         cd ${{inputs.cov_install_folder}} && tar -xf ${{inputs.cov_version}}.tar.gz && rm -rf ${{inputs.cov_version}}.tar.gz
         cd ${{inputs.cov_version}} && rm -rf ${{inputs.cov_remove_folders}}
         if [ -z ${{inputs.cov_license}} ]
         then 
-          curl -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat ${{inputs.cov_url}}/downloads/license.dat
+          curl -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat ${{inputs.cov_url}}/downloadFile.htm?fn=license.dat
         else
           cp ${{inputs.cov_license}} ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin
         fi
