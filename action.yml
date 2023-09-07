@@ -133,7 +133,6 @@ runs:
         echo "cov_output=${{inputs.cov_output}}" >> $GITHUB_ENV
       shell: bash
     # Run Coverity configures.
-    - name:
-      if: ${{inputs.cov_configures != ''}}
+    - if: ${{inputs.cov_configures != ''}}
       run: ${{inputs.cov_configures}}
       shell: bash
