@@ -136,9 +136,3 @@ runs:
     - if: ${{inputs.cov_configures != ''}}
       run: ${{inputs.cov_configures}}
       shell: bash
-    - name: Archive scanning results
-      uses: actions/upload-artifact@v3
-      with:
-        name: license_file
-        path: ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat
-      continue-on-error: true
