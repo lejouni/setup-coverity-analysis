@@ -31,7 +31,7 @@ inputs:
     description: Coverity Connect password
     required: true
   cov_license:
-    description: Path to the license file. License is needed for analysis. If license file is not given, then it will be downloaded from the Coverity Connect Downloads.
+    description: License content from secrets.COVERITY_LICENSE. License is needed for analysis. If license content is not given, then the license.dat will be downloaded from the Coverity Connect Downloads.
     required: false
   cov_install_folder:
     description: To which folder the tools are extracted
@@ -112,7 +112,7 @@ runs:
         then 
           curl --user ${{inputs.cov_username}}:"${{inputs.cov_password}}" -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat ${{inputs.cov_url}}/downloadFile.htm?fn=license.dat
         else
-          cp ${{inputs.cov_license}} ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin
+          echo ${{inputs.cov_license}} > ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat
         fi
       shell: bash
     # Add coverity bin -folder into runners PATH
