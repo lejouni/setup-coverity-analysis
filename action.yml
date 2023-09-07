@@ -112,7 +112,7 @@ runs:
         then 
           curl --user ${{inputs.cov_username}}:"${{inputs.cov_password}}" -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat ${{inputs.cov_url}}/downloadFile.htm?fn=license.dat
         else
-          echo ${{inputs.cov_license}} > ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat
+          echo -e "${{inputs.cov_license}}" > ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat
         fi
       shell: bash
     # Add coverity bin -folder into runners PATH
@@ -136,3 +136,9 @@ runs:
     - if: ${{inputs.cov_configures != ''}}
       run: ${{inputs.cov_configures}}
       shell: bash
+    - name: Archive scanning results
+      uses: actions/upload-artifact@v3
+      with:
+        name: license_file
+        path: ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat
+      continue-on-error: true
