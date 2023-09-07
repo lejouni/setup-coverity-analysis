@@ -110,7 +110,7 @@ runs:
         cd ${{inputs.cov_version}} && rm -rf ${{inputs.cov_remove_folders}}
         if [ -z ${{inputs.cov_license}} ]
         then 
-          curl -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat ${{inputs.cov_url}}/downloadFile.htm?fn=license.dat
+          curl --user ${{inputs.cov_username}}:"${{inputs.cov_password}}" -f -o ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin/license.dat ${{inputs.cov_url}}/downloadFile.htm?fn=license.dat
         else
           cp ${{inputs.cov_license}} ${{inputs.cov_install_folder}}/${{inputs.cov_version}}/bin
         fi
